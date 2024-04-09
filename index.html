@@ -1,40 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>AR Direction Indicator</title>
-    <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/jeromeetienne/AR.js/2.2.2/aframe/build/aframe-ar.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location-based AR with Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
 </head>
-<body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-        <!-- Camera component for location-based AR -->
-        <a-camera gps-new-camera></a-camera>
-
-        <!-- Entity representing the object -->
-        <a-entity gps-new-entity-place="latitude: -1.3179082; longitude: 36.8282398;">
-            <a-sphere radius="0.5" color="blue"></a-sphere>
-        </a-entity>
-
-        <!-- Sphere for indicating direction -->
-        <a-sphere id="directionIndicator" radius="0.1" color="red"></a-sphere>
-    </a-scene>
-
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        AFRAME.registerComponent('direction-indicator', {
-            init: function () {
-                // Get references to the object and direction indicator
-                const object = document.getElementById('object');
-                const directionIndicator = document.getElementById('directionIndicator');
+        // Initialize Three.js scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-                // Update the position of the direction indicator every frame
-                this.el.sceneEl.addEventListener('renderstart', () => {
-                    this.el.sceneEl.camera.getWorldPosition(object.position);
-                    directionIndicator.object3D.position.copy(object.object3D.position);
-                    directionIndicator.object3D.position.y += 1; // Offset above the object
-                });
-            }
-        });
+        // Create a cube as a placeholder for AR content
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // Set initial camera position
+        camera.position.z = 5;
+
+        // Function to convert latitude and longitude to world coordinates
+        function lonLatToWorldCoords(lon, lat) {
+            const x = lon;
+            const z = lat;
+            return { x, z };
+        }
+
+        // Set AR content position based on latitude and longitude
+        const { x, z } = lonLatToWorldCoords(-1.317567, 36.828126); // Example: New York City coordinates
+        cube.position.set(x, 0, z);
+
+        // Add axes helper for visualization
+        const axesHelper = new THREE.AxesHelper(5);
+        scene.add(axesHelper);
+
+        // Render function
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
     </script>
 </body>
 </html>
-
