@@ -1,66 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location-based AR with Three.js</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
-        canvas {
-            display: block;
-        }
-    </style>
+  <title>AR Venue Navigation</title>
+  <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/jeromeetienne/AR.js/2.2.2/aframe/build/aframe-ar.js"></script>
 </head>
-<body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        // Initialize Three.js scene
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+<body style='margin: 0px; overflow: hidden;'>
+  <a-scene embedded arjs>
+    <!-- Camera Component -->
+    <a-camera gps-new-camera></a-camera>
 
-        // Create a textured sphere representing the Earth
-        const earthTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
-        const earthGeometry = new THREE.SphereGeometry(2, 32, 32);
-        const earthMaterial = new THREE.MeshBasicMaterial({ map: earthTexture });
-        const earth = new THREE.Mesh(earthGeometry, earthMaterial);
-        scene.add(earth);
+    <!-- Marker 1 -->
+    <a-marker gps-new-entity-place="latitude: <latitude_1>; longitude: <longitude_1>">
+      <!-- AR Element for Marker 1 -->
+      <a-entity position="0 0.1 0">
+        <a-text value="Location 1" color="white" align="center"></a-text>
+      </a-entity>
+    </a-marker>
 
-        // Create a cube as a placeholder for AR content
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+    <!-- Marker 2 -->
+    <a-marker gps-new-entity-place="latitude: <latitude_2>; longitude: <longitude_2>">
+      <!-- AR Element for Marker 2 -->
+      <a-entity position="0 0.1 0">
+        <a-text value="Location 2" color="white" align="center"></a-text>
+      </a-entity>
+    </a-marker>
 
-        // Set initial camera position
-        camera.position.z = 5;
+    <!-- Add more markers as needed -->
 
-        // Function to convert latitude and longitude to world coordinates
-        function lonLatToWorldCoords(lon, lat) {
-            const x = (lon + 180) / 360 * 2 * Math.PI;
-            const y = (lat + 90) / 180 * Math.PI;
-            return { x: Math.sin(x) * Math.cos(y) * 2, y: Math.sin(y) * 2, z: Math.cos(x) * Math.cos(y) * 2 };
-        }
+    <!-- Direction Dots -->
+    <!-- Add dots to show direction relative to the user -->
+    <!-- You can dynamically position these dots based on user's orientation -->
+    <a-entity position="0 0 -5">
+      <a-sphere color="yellow" radius="0.1"></a-sphere>
+    </a-entity>
+    <!-- Add more direction dots as needed -->
 
-        // Set AR content position based on latitude and longitude
-        const { x, y, z } = lonLatToWorldCoords(-74.006, 40.7128); // Example: New York City coordinates
-        cube.position.set(x, y, z);
+    <!-- Handle events or interactions here -->
 
-        // Add axes helper for visualization
-        const axesHelper = new THREE.AxesHelper(5);
-        scene.add(axesHelper);
-
-        // Render function
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
-        }
-        animate();
-    </script>
+  </a-scene>
 </body>
 </html>
+
