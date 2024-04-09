@@ -18,22 +18,15 @@
       </a-entity>
     </a-marker>
 
-    <!-- Marker 2 -->
-    <a-marker id="marker2" gps-new-entity-place="latitude: <latitude_2>; longitude: <longitude_2>">
-      <!-- AR Element for Marker 2 -->
-      <a-entity position="0 0.1 0">
-        <a-text value="Location 2" color="white" align="center"></a-text>
-      </a-entity>
-    </a-marker>
-
     <!-- Direction Indicators -->
-    <a-entity id="directionIndicator1" position="0 1 -5" text="value: Go Here; color: red; align: center;"></a-entity>
-    <a-entity id="directionIndicator2" position="0 1 -5" text="value: Go Here; color: red; align: center;"></a-entity>
+    <a-entity id="directionIndicator" position="0 1 -5" text="value: Go Here; color: red; align: center;"></a-entity>
 
     <!-- Handle events or interactions here -->
   </a-scene>
 
   <script>
+    var cameraEl = document.querySelector('a-camera');
+
     // Get user's GPS location
     navigator.geolocation.getCurrentPosition(function(position) {
       var userLat = position.coords.latitude;
@@ -42,45 +35,26 @@
       // Calculate distance and bearing for Marker 1
       var marker1Lat = parseFloat(document.getElementById('marker1').getAttribute('gps-new-entity-place').latitude);
       var marker1Lon = parseFloat(document.getElementById('marker1').getAttribute('gps-new-entity-place').longitude);
-      var distanceToMarker1 = calculateDistance(userLat, userLon, marker1Lat, marker1Lon);
       var bearingToMarker1 = calculateBearing(userLat, userLon, marker1Lat, marker1Lon);
 
-      // Rotate Marker 1 based on bearing
-      document.getElementById('marker1').setAttribute('rotation', '0 ' + bearingToMarker1 + ' 0');
-
-      // Calculate distance and bearing for Marker 2 (similarly for other markers)
-      // var marker2Lat = parseFloat(document.getElementById('marker2').getAttribute('gps-new-entity-place').latitude);
-      // var marker2Lon = parseFloat(document.getElementById('marker2').getAttribute('gps-new-entity-place').longitude);
-      // var distanceToMarker2 = calculateDistance(userLat, userLon, marker2Lat, marker2Lon);
-      // var bearingToMarker2 = calculateBearing(userLat, userLon, marker2Lat, marker2Lon);
-
-      // Display directional indicators
+      // Display directional indicator
       if (bearingToMarker1 !== null) {
-        var directionIndicator1 = document.getElementById('directionIndicator1');
-        directionIndicator1.setAttribute('rotation', '0 ' + bearingToMarker1 + ' 0');
-        directionIndicator1.setAttribute('visible', 'true');
+        var directionIndicator = document.getElementById('directionIndicator');
+        directionIndicator.setAttribute('rotation', '0 ' + bearingToMarker1 + ' 0');
+        directionIndicator.setAttribute('visible', 'true');
       }
 
-      // Similar logic for other markers
+      // Rotate directional indicator based on device orientation
+      window.addEventListener('deviceorientation', function(event) {
+        var alpha = event.alpha; // Rotation around the z-axis (in degrees)
+        var beta = event.beta; // Rotation around the x-axis (in degrees)
+        var gamma = event.gamma; // Rotation around the y-axis (in degrees)
+
+        // Adjust rotation of direction indicator based on device orientation
+        var rotationY = gamma; // Adjust according to your device's orientation axis
+        directionIndicator.setAttribute('rotation', '0 ' + rotationY + ' 0');
+      });
     });
-
-    // Function to calculate distance between two GPS coordinates (Haversine formula)
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-      var R = 6371; // Radius of the earth in km
-      var dLat = deg2rad(lat2 - lat1);
-      var dLon = deg2rad(lon2 - lon1);
-      var a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      var d = R * c; // Distance in km
-      return d;
-    }
-
-    function deg2rad(deg) {
-      return deg * (Math.PI / 180);
-    }
 
     // Function to calculate bearing between two GPS coordinates
     function calculateBearing(lat1, lon1, lat2, lon2) {
@@ -93,8 +67,13 @@
       brng = (brng + 360) % 360; // Normalize to 0-360 degrees
       return brng;
     }
+
+    function deg2rad(deg) {
+      return deg * (Math.PI / 180);
+    }
   </script>
 </body>
 </html>
+
 
 
