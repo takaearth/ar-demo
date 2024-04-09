@@ -24,9 +24,16 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
+        // Create a textured sphere representing the Earth
+        const earthTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
+        const earthGeometry = new THREE.SphereGeometry(2, 32, 32);
+        const earthMaterial = new THREE.MeshBasicMaterial({ map: earthTexture });
+        const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+        scene.add(earth);
+
         // Create a cube as a placeholder for AR content
         const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
         const cube = new THREE.Mesh(geometry, material);
         scene.add(cube);
 
@@ -35,14 +42,14 @@
 
         // Function to convert latitude and longitude to world coordinates
         function lonLatToWorldCoords(lon, lat) {
-            const x = lon;
-            const z = lat;
-            return { x, z };
+            const x = (lon + 180) / 360 * 2 * Math.PI;
+            const y = (lat + 90) / 180 * Math.PI;
+            return { x: Math.sin(x) * Math.cos(y) * 2, y: Math.sin(y) * 2, z: Math.cos(x) * Math.cos(y) * 2 };
         }
 
         // Set AR content position based on latitude and longitude
-        const { x, z } = lonLatToWorldCoords(-1.317567, 36.828126); // Example: New York City coordinates
-        cube.position.set(x, 0, z);
+        const { x, y, z } = lonLatToWorldCoords(-74.006, 40.7128); // Example: New York City coordinates
+        cube.position.set(x, y, z);
 
         // Add axes helper for visualization
         const axesHelper = new THREE.AxesHelper(5);
