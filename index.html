@@ -1,44 +1,85 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>AR Venue Navigation</title>
-  <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/jeromeetienne/AR.js/2.2.2/aframe/build/aframe-ar.js"></script>
-</head>
-<body style='margin: 0px; overflow: hidden;'>
-  <a-scene embedded arjs>
-    <!-- Camera Component -->
-    <a-camera gps-new-camera></a-camera>
 
-    <!-- Marker 1 -->
-    <a-marker gps-new-entity-place="latitude: -1.317567; longitude: 36.828126">
-      <!-- AR Element for Marker 1 -->
-      <a-entity position="0 0.1 0">
-        <a-text value="Location 1" color="white" align="center"></a-text>
-      </a-entity>
-    </a-marker>
 
-    <!-- Marker 2 -->
-    <a-marker gps-new-entity-place="latitude: -1.3179082; longitude: 36.8282398">
-      <!-- AR Element for Marker 2 -->
-      <a-entity position="0 0.1 0">
-        <a-text value="Location 2" color="white" align="center"></a-text>
-      </a-entity>
-    </a-marker>
-
-    <!-- Add more markers as needed -->
-
-    <!-- Direction Dots -->
-    <!-- Add dots to show direction relative to the user -->
-    <!-- You can dynamically position these dots based on user's orientation -->
-    <a-entity position="0 0 -5">
-      <a-sphere color="yellow" radius="0.1"></a-sphere>
-    </a-entity>
-    <!-- Add more direction dots as needed -->
-
-    <!-- Handle events or interactions here -->
-
-  </a-scene>
-</body>
-</html>
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>AR Venue Navigation</title>
+      <script src="https://aframe.io/releases/1.0.0/aframe.min.js"></script>
+      <script src="https://raw.githack.com/jeromeetienne/AR.js/2.2.2/aframe/build/aframe-ar.js"></script>
+    </head>
+    <body style='margin: 0px; overflow: hidden;'>
+      <a-scene embedded arjs>
+        <!-- Camera Component -->
+        <a-camera gps-new-camera></a-camera>
+    
+        <!-- Marker 1 -->
+        <a-marker gps-new-entity-place="latitude: -1.317567; longitude: 36.828126">
+          <!-- AR Element for Marker 1 -->
+          <a-entity position="0 0.1 0">
+            <a-text value="Location 1" color="white" align="center"></a-text>
+          </a-entity>
+        </a-marker>
+    
+        <!-- Marker 2 -->
+        <a-marker gps-new-entity-place="latitude: -1.3179082; longitude: 36.8282398">
+          <!-- AR Element for Marker 2 -->
+          <a-entity position="0 0.1 0">
+            <a-text value="Location 2" color="white" align="center"></a-text>
+          </a-entity>
+        </a-marker>
+    
+        <!-- Handle events or interactions here -->
+      </a-scene>
+    
+      <script>
+        // Get user's GPS location
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var userLat = position.coords.latitude;
+          var userLon = position.coords.longitude;
+    
+          // Calculate distance and bearing for Marker 1
+          var marker1Lat = parseFloat(document.getElementById('marker1').getAttribute('gps-new-entity-place').latitude);
+          var marker1Lon = parseFloat(document.getElementById('marker1').getAttribute('gps-new-entity-place').longitude);
+          var distanceToMarker1 = calculateDistance(userLat, userLon, marker1Lat, marker1Lon);
+          var bearingToMarker1 = calculateBearing(userLat, userLon, marker1Lat, marker1Lon);
+    
+          // Rotate Marker 1 based on bearing
+          document.getElementById('marker1').setAttribute('rotation', '0 ' + bearingToMarker1 + ' 0');
+    
+          // Repeat the same for other markers if needed
+        });
+    
+        // Function to calculate distance between two GPS coordinates (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+          var R = 6371; // Radius of the earth in km
+          var dLat = deg2rad(lat2 - lat1);
+          var dLon = deg2rad(lon2 - lon1);
+          var a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+          var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          var d = R * c; // Distance in km
+          return d;
+        }
+    
+        function deg2rad(deg) {
+          return deg * (Math.PI / 180);
+        }
+    
+        // Function to calculate bearing between two GPS coordinates
+        function calculateBearing(lat1, lon1, lat2, lon2) {
+          var dLon = deg2rad(lon2 - lon1);
+          var y = Math.sin(dLon) * Math.cos(deg2rad(lat2));
+          var x = Math.cos(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) -
+                  Math.sin(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(dLon);
+          var brng = Math.atan2(y, x);
+          brng = brng * (180 / Math.PI); // Convert bearing from radians to degrees
+          brng = (brng + 360) % 360; // Normalize to 0-360 degrees
+          return brng;
+        }
+      </script>
+    </body>
+    </html>
+    
 
