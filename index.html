@@ -9,6 +9,10 @@
     .a-enter-vr-button {
       display: none !important; /* Hide the VR button */
     }
+      /* Hide the markers area and tracking backend text */
+      .a-marker-controller > .info, .a-marker-controller > .backend-info {
+        display: none !important;
+      }
   </style>
   <body style='margin: 0px; overflow: hidden;'>
     <a-scene embedded arjs>
@@ -18,9 +22,5 @@
       </a-marker>
       <a-entity camera></a-entity>
     </a-scene>
-    <script>
-      // Remove the markers area and tracking backend text
-      document.querySelector('a-marker-camera').removeAttribute('visible');
-    </script>
   </body>
 </html>
