@@ -11,12 +11,16 @@
     }
   </style>
   <body style='margin: 0px; overflow: hidden;'>
-    <a-scene embedded arjs='sourceType: webcam;'>
+    <a-scene embedded arjs>
       <a-marker preset="custom" type="pattern" url="./pattern-cola.patt">
         <a-video src="ocean.mp4" width="3" height="2.25" position='0 0 0' rotation="-90 0 0"></a-video>
         <!-- Adjust width, height, position, and rotation as needed -->
       </a-marker>
       <a-entity camera></a-entity>
     </a-scene>
+    <script>
+      // Remove the markers area and tracking backend text
+      document.querySelector('a-marker-camera').removeAttribute('visible');
+    </script>
   </body>
 </html>
